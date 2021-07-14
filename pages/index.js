@@ -22,6 +22,33 @@ function ProfileSidebar(propriedades) {
   )
 }
 
+function ProfileRalationsBox(propriedades){
+  return (
+    <ProfileRelationsBoxWrapper>
+      <h2 className='smallTitle'>
+        {propriedades.title} ({propriedades.items.length})
+      </h2>
+      <ul>
+          {/* {propriedades.map((itemAtual) => {
+            return ( 
+              <li key={propriedades.id}>
+                <a href={`https://github.com/${propriedades[login]}.png`}>
+                  <img src={propriedades.image} />
+                  <span>{propriedades.title}</span>
+                </a>
+              </li>
+            )
+          })} */}
+      </ul>
+      <hr />
+      <frames className="boxLink">
+        Ver Todos
+      </frames>
+    </ProfileRelationsBoxWrapper>
+  )
+}
+
+
 export default function Home() {
   
   const githubUser = 'cristpb';
@@ -34,7 +61,20 @@ export default function Home() {
   //const comunidades = ['Alurakut'];
   //const pessoasFavoritas = ['omariosouto','juunegreiros','peas','rafaballerini','felipeoferreira','BrunoASNascimento','gssantaella','fsadauto']
   const pessoasFavoritas = ['omariosouto','juunegreiros','peas','rafaballerini','felipeoferreira','BrunoASNascimento']
-  
+
+  //0 - Pegando o arry de dados do github
+  const [seguidores, setSeguidores] = React.useState([]);
+  React.useEffect(function(){
+    fetch('https://api.github.com/users/cristpb/followers')
+      .then(function (respostaDoServidor){
+        return respostaDoServidor.json();
+      })
+      .then(function(respostaCompleta) {
+        setSeguidores(respostaCompleta);
+        console.log(respostaCompleta);
+      })
+    }, [])
+
   return (
     <>
       <AlurakutMenu githubUser={githubUser} />
@@ -93,6 +133,8 @@ export default function Home() {
 
         <div className="profileRelationsArea" style={{ gridArea: 'profileRelationsArea' }}>
           
+          <ProfileRalationsBox title="seguidores" items={seguidores}/>
+
           <ProfileRelationsBoxWrapper>
             <h2 className='smallTitle'>
               Comunidades ({comunidades.length})
