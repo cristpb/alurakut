@@ -1,4 +1,6 @@
 import React from 'react';
+import nookies from 'nookies';
+import jwt from 'jsonwebtoken';
 import MainGrid from '../src/components/MainGrid'
 import Box from '../src/components/Box'
 import { AlurakutMenu, AlurakutProfileSidebarMenuDefault, OrkutNostalgicIconSet } from '../src/lib/AlurakutCommons';
@@ -49,11 +51,11 @@ function ProfileRalationsBox(propriedades){
 }
 
 
-export default function Home() {
+export default function Home(props) {
   
-  const githubUser = 'cristpb';
+  const githubUser = props.githubUser;
   const [comunidades, setComunidades] = React.useState([]);
-  console.log(comunidades);
+  //console.log(comunidades);
   //const comunidades = ['Alurakut'];
   //const pessoasFavoritas = ['omariosouto','juunegreiros','peas','rafaballerini','felipeoferreira','BrunoASNascimento','gssantaella','fsadauto']
   const pessoasFavoritas = ['omariosouto','juunegreiros','peas','rafaballerini','felipeoferreira','BrunoASNascimento']
@@ -67,7 +69,7 @@ export default function Home() {
       })
       .then(function(respostaCompleta) {
         setSeguidores(respostaCompleta);
-        console.log(respostaCompleta);
+        //console.log(respostaCompleta);
       })
 
     fetch('https://graphql.datocms.com/', {
@@ -89,7 +91,7 @@ export default function Home() {
     .then((response) => response.json()) // Pega o retorno do response.json() e já retorna
     .then((respostaCompleta) => {
       const comunidadesVindasDoDato = respostaCompleta.data.allCommunities;
-      console.log(comunidadesVindasDoDato)
+      //console.log(comunidadesVindasDoDato)
       setComunidades(comunidadesVindasDoDato)
     })
 
@@ -217,4 +219,35 @@ export default function Home() {
       </MainGrid>
     </>
   )
+}
+
+
+export async function getServerSideProps(context) {
+  const cookies = nookies.get(context)
+  const token = cookies.USER_TOKEN;
+  const { isAuthenticated } = await fetch('https://alurakut.vercel.app/api/auth', {
+    headers: {
+        Authorization: token
+      }
+  })
+  .then((resposta) => resposta.json())
+  console.log(token);
+  //console.log(githubUser);
+  console.log('Autenticado', isAuthenticated);
+
+  if(!isAuthenticated) {
+    return {
+      redirect: {
+        destination: '/login',
+        permanent: false,
+      }
+    }
+  }
+
+  const { githubUser } = jwt.decode(token);
+  return {
+    props: {
+      githubUser
+    }, // will be passed to the page component as props
+  }
 }
