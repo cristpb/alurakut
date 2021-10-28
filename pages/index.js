@@ -50,7 +50,6 @@ function ProfileRalationsBox(propriedades){
   )
 }
 
-
 export default function Home(props) {
   
   const githubUser = props.githubUser;
